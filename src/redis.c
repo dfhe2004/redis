@@ -658,7 +658,10 @@ void activeExpireCycle(void) {
                     sds key = dictGetKey(de);
                     robj *keyobj = createStringObject(key,sdslen(key));
 
-                    propagateExpire(db,keyobj);
+                    if (sdslen(key)>1 && key[0]=='~'){
+		        collectExpired(db,keyobj); // dfhe2004
+		    }
+		    propagateExpire(db,keyobj);
                     dbDelete(db,keyobj);
                     decrRefCount(keyobj);
                     expired++;
@@ -1049,6 +1052,7 @@ void createSharedObjects(void) {
     shared.unsubscribebulk = createStringObject("$11\r\nunsubscribe\r\n",18);
     shared.psubscribebulk = createStringObject("$10\r\npsubscribe\r\n",17);
     shared.punsubscribebulk = createStringObject("$12\r\npunsubscribe\r\n",19);
+    shared.expiredpool = createStringObject("ExpiredPool",11); // dfhe2004
     shared.del = createStringObject("DEL",3);
     shared.rpop = createStringObject("RPOP",4);
     shared.lpop = createStringObject("LPOP",4);

@@ -371,6 +371,7 @@ struct sharedObjectsStruct {
     *masterdownerr, *roslaveerr,
     *oomerr, *plus, *messagebulk, *pmessagebulk, *subscribebulk,
     *unsubscribebulk, *psubscribebulk, *punsubscribebulk, *del, *rpop, *lpop,
+    *expiredpool,                        /* dfhe2004 */
     *select[REDIS_SHARED_SELECT_CMDS],
     *integers[REDIS_SHARED_INTEGERS],
     *mbulkhdr[REDIS_SHARED_BULKHDR_LEN], /* "*<value>\r\n" */
@@ -936,6 +937,7 @@ void appendServerSaveParams(time_t seconds, int changes);
 void resetServerSaveParams();
 
 /* db.c -- Keyspace access API */
+void collectExpired(redisDb *db, robj *key);  //dfhe2004
 int removeExpire(redisDb *db, robj *key);
 void propagateExpire(redisDb *db, robj *key);
 int expireIfNeeded(redisDb *db, robj *key);

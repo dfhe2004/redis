@@ -495,6 +495,19 @@ int expireIfNeeded(redisDb *db, robj *key) {
     return dbDelete(db,key);
 }
 
+
+void collectExpired(redisDb *db, robj *key) {
+    robj *lobj = lookupKeyWrite(db,shared.expiredpool);
+    if (!lobj) {
+        lobj = createZiplistObject();
+        dbAdd(db,shared.expiredpool,lobj);
+    }
+    listTypePush(lobj,key,REDIS_TAIL);
+    signalModifiedKey(db,shared.expiredpool);
+    server.dirty += 1;
+}
+
+
 /*-----------------------------------------------------------------------------
  * Expires Commands
  *----------------------------------------------------------------------------*/
